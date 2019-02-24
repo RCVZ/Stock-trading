@@ -13,7 +13,7 @@
             type="number"
             class="form-control"
             placeholder="Quantity"
-            v-model="quantity"
+            v-model.number="quantity"
           >
         </div>
         <div class="pull-right">
