@@ -21,7 +21,9 @@
             @click="submit"
             class="btn btn-success"
             :disabled="quantity <= 0 || !Number.isInteger(quantity)"
-          >Buy</button>
+          >
+            Buy
+          </button>
         </div>
       </div>
     </div>
@@ -29,23 +31,29 @@
 </template>
 
 <script>
+// import { mapActions } from 'vuex';
+
 export default {
   props: ['id', 'name', 'price'],
   data () {
     return {
       quantity: 0
-    }
+    };
   },
   methods: {
+    // ...mapActions([
+    //   'buyStock'
+    // ]),
     submit () {
-      const data = {
+      const order = {
         id: this.id,
         name: this.name,
         price: this.price
-      }
-      console.log(data)
-      this.quantity = 0
+      };
+      console.log(order);
+      this.quantity = 0;
+      this.$store.dispatch('buyStock', order);
     }
   }
-}
+};
 </script>
