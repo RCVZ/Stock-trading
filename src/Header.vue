@@ -28,23 +28,90 @@
           </router-link>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="#">End Day</a></li>
-          <li class="dropdown">
+          <li>
             <a
+              href="#"
+              @click="rdnStock"
+            >End Day
+            </a>
+          </li>
+          <li
+            class="dropdown"
+            :class="{open: expand}"
+          >
+            <a
+              @click="expand = !expand"
               href="#"
               class="dropdown-toggle"
               data-toggle="dropdown"
               role="button"
               aria-haspopup="true"
               aria-expanded="false"
-            >Save & Load <span class="caret" /></a>
+            >Save & Load
+              <span class="caret" />
+            </a>
             <ul class="dropdown-menu">
-              <li><a href="#">Save</a></li>
-              <li><a href="#">Load</a></li>
+              <li>
+                <a
+                  @click="save"
+                  href="#"
+                >Save
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  @click="load"
+                >Load
+                </a>
+              </li>
             </ul>
+          </li>
+          <li>
+            <span class="navbar-text">FUNDS: €{{ funds }}</span>
           </li>
         </ul>
       </div>
     </div>
   </nav>
 </template>
+
+<script>
+import { mapActions } from 'vuex';
+
+export default {
+  data () {
+    return {
+      expand: false
+    };
+  },
+  computed: {
+    funds () {
+      return this.$store.getters.funds;
+    }
+  },
+  methods: {
+    ...mapActions([
+      'randomizeStocks',
+      'loadData'
+    ]),
+    rdnStock () {
+      this.randomizeStocks();
+    },
+    save () {
+      const { funds, portfolioStocks, stocks } = this.$store.getters;
+      const data = {
+        funds,
+        portfolioStocks,
+        stocks
+      };
+      this.$http.put('data.json', data);
+      this.expand = false;
+    },
+    load () {
+      this.loadData();
+      this.expand = false;
+    }
+  }
+};
+</script>
