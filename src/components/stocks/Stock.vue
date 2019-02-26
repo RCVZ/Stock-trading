@@ -3,8 +3,8 @@
     <div class="panel panel-success">
       <div class="panel-heading">
         <h3 class="panel-title">
-          {{ name }}
-          <small>(Price: {{ price }})</small>
+          {{ stock.name }}
+          <small>(Price: {{ stock.price }})</small>
         </h3>
       </div>
       <div class="panel-body">
@@ -20,7 +20,7 @@
           <button
             @click="submit"
             class="btn btn-success"
-            :disabled="quantity <= 0 || !Number.isInteger(quantity)"
+            :disabled="availableFunds || quantity <= 0 || !Number.isInteger(quantity)"
           >
             Buy
           </button>
@@ -31,26 +31,28 @@
 </template>
 
 <script>
-// import { mapActions } from 'vuex';
-
 export default {
-  props: ['id', 'name', 'price'],
+  props: ['stock'],
   data () {
     return {
       quantity: 0
     };
   },
+  computed: {
+    funds () {
+      return this.$store.getters.funds;
+    },
+    availableFunds () {
+      return this.quantity * this.stock.price > this.funds;
+    }
+  },
   methods: {
-    // ...mapActions([
-    //   'buyStock'
-    // ]),
     submit () {
       const order = {
-        id: this.id,
-        name: this.name,
-        price: this.price
+        id: this.stock.id,
+        quantity: this.quantity,
+        price: this.stock.price
       };
-      console.log(order);
       this.quantity = 0;
       this.$store.dispatch('buyStock', order);
     }
