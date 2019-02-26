@@ -11,34 +11,42 @@ export default new Vuex.Store({
     portfolioStocks: []
   },
   mutations: {
-    SET_STOCKS (state, stocks) {
+    'SET_STOCKS' (state, stocks) {
       state.stocks = stocks;
     },
-    RND_STOCK (state) {
-
+    'RND_STOCK' (state) {
+      state.stocks.forEach(stock => {
+        if (stock.price < 3) {
+          stock.price += 10;
+        };
+        stock.price = Math.round(stock.price * (1 + Math.random() - 0.45));
+      });
     },
-    BUY_STOCK (state, { stockId, quantity, stockPrice }) {
-      const record = state.portfolioStocks.find(el => el.id === stockId);
+    'BUY_STOCK' (state, { id, quantity, price }) {
+      const record = state.portfolioStocks.find(el => el.id === id);
       if (record) {
         record.quantity += quantity;
       } else {
         state.portfolioStocks.push({
-          id: stockId,
+          id: id,
           quantity: quantity
         });
       }
-      state.funds -= stockPrice * quantity;
-      console.log('test', state.portfolioStocks);
+      state.funds -= price * quantity;
     },
-    SELL_STOCK (state, { stockId, quantity, stockPrice }) {
-      const record = state.portfolioStocks.find(el => el.id === stockId);
+    'SELL_STOCK' (state, { id, quantity, price }) {
+      const record = state.portfolioStocks.find(el => el.id === id);
       if (record.quantity > quantity) {
         record.quantity -= quantity;
       } else {
         const index = state.portfolioStocks.indexOf(record);
         state.portfolioStocks.splice(index, 1);
       }
-      state.funds += stockPrice * quantity;
+      state.funds += price * quantity;
+    },
+    'SET_PORTFOLIO' (state, portfolio) {
+      state.funds = portfolio.funds;
+      state.portfolioStocks = portfolio.portfolioStocks ? portfolio.portfolioStocks : [];
     }
   },
   actions: {
@@ -53,6 +61,25 @@ export default new Vuex.Store({
     },
     sellStock: ({ commit }, order) => {
       commit('SELL_STOCK', order);
+    },
+    loadData: ({ commit }) => {
+      Vue.http.get('data.json')
+        .then(response => response.json())
+        .then(data => {
+          if (data) {
+            const stocks = data.stocks;
+            const funds = data.funds;
+            const portfolioStocks = data.portfolioStocks;
+
+            const portfolio = {
+              portfolioStocks,
+              funds
+            };
+
+            commit('SET_STOCKS', stocks);
+            commit('SET_PORTFOLIO', portfolio);
+          }
+        });
     }
   },
   getters: {
