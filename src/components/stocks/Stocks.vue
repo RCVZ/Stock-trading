@@ -3,9 +3,7 @@
     <Stock
       v-for="(stock, index) in stocks"
       :key="index"
-      :id="stock.id"
-      :name="stock.name"
-      :price="stock.price"
+      :stock="stock"
     />
   </div>
 </template>
