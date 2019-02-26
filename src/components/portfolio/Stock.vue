@@ -1,10 +1,10 @@
 <template>
   <div class="col-sm-6 col-md-4">
-    <div class="panel panel-success">
+    <div class="panel panel-primary">
       <div class="panel-heading">
         <h3 class="panel-title">
-          {{ name }}
-          <small>(Price: {{ price }} | {{ quantity }})</small>
+          {{ stock.name }}
+          <small>(Price: {{ stock.price }} | {{ stock.quantity }})</small>
         </h3>
       </div>
       <div class="panel-body">
@@ -18,9 +18,9 @@
         </div>
         <div class="pull-right">
           <button
-            @click="submit"
+            @click="sell"
             class="btn btn-success"
-            :disabled="quantity <= 0 || !Number.isInteger(quantity)"
+            :disabled="quantity <= 0 || !Number.isInteger(quantity) || availableQuantity"
           >
             Sell
           </button>
@@ -34,26 +34,33 @@
 import { mapActions } from 'vuex';
 
 export default {
-  props: ['quantity', 'name', 'price'],
+  props: ['stock'],
   data () {
     return {
       quantity: 0
     };
   },
-  methods: {
-    submit () {
-      const data = {
-        id: this.id,
-        name: this.name,
-        price: this.price
-      };
-      console.log(data);
-      this.quantity = 0;
-      this.buyStock(data);
+  computed: {
+    funds () {
+      return this.$store.getters.funds < this.stock.price;
     },
+    availableQuantity () {
+      return this.quantity > this.stock.quantity;
+    }
+  },
+  methods: {
     ...mapActions([
-      'buyStock'
-    ])
+      'sellStock'
+    ]),
+    sell () {
+      const order = {
+        id: this.stock.id,
+        price: this.stock.price,
+        quantity: this.stock.quantity
+      };
+      this.quantity = 0;
+      this.sellStock(order);
+    }
   }
 };
 </script>
