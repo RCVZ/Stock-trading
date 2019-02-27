@@ -4,6 +4,10 @@ import stocks from '../data/stocks.js';
 
 Vue.use(Vuex);
 
+interface stock {
+  price: number
+}
+
 export default new Vuex.Store({
   state: {
     stocks: [],
@@ -15,15 +19,15 @@ export default new Vuex.Store({
       state.stocks = stocks;
     },
     'RND_STOCK' (state) {
-      state.stocks.forEach(stock => {
+      state.stocks.forEach((stock: stock) => {
         if (stock.price < 3) {
           stock.price += 10;
         };
         stock.price = Math.round(stock.price * (1 + Math.random() - 0.45));
       });
     },
-    'BUY_STOCK' (state, { id, quantity, price }) {
-      const record = state.portfolioStocks.find(el => el.id === id);
+    'BUY_STOCK' (state: any, { id, quantity, price }) {
+      const record = state.portfolioStocks.find((el: any) => el.id === id);
       if (record) {
         record.quantity += quantity;
       } else {
@@ -34,8 +38,8 @@ export default new Vuex.Store({
       }
       state.funds -= price * quantity;
     },
-    'SELL_STOCK' (state, { id, quantity, price }) {
-      const record = state.portfolioStocks.find(el => el.id === id);
+    'SELL_STOCK' (state: any, { id, quantity , price }) {
+      const record = state.portfolioStocks.find((el: any) => el.id === id);
       if (record.quantity > quantity) {
         record.quantity -= quantity;
       } else {
@@ -64,8 +68,8 @@ export default new Vuex.Store({
     },
     loadData: ({ commit }) => {
       Vue.http.get('data.json')
-        .then(response => response.json())
-        .then(data => {
+        .then((response: any )=> response.json())
+        .then((data: any )=> {
           if (data) {
             const stocks = data.stocks;
             const funds = data.funds;
@@ -86,13 +90,15 @@ export default new Vuex.Store({
     stocks: state => {
       return state.stocks;
     },
-    portfolioStocks: state => state.portfolioStocks.map(stock => {
-      const record = state.stocks.find(el => el.id === stock.id);
+    portfolioStocks: state => state.portfolioStocks.map((stock: any) => {
+      const record = state.stocks.find((el: any) => el.id === stock.id);
+      const { id, quantity, } = stock;
+      const { name, price }: any = record;
       return {
-        id: stock.id,
-        quantity: stock.quantity,
-        name: record.name,
-        price: record.price
+        id:id,
+        quantity: quantity,
+        name: name,
+        price: price
       };
     }),
     funds: state => {
