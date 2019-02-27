@@ -5,7 +5,8 @@ module.exports = {
   },
   'extends': [
     'plugin:vue/strongly-recommended',
-    '@vue/standard'
+    '@vue/standard',
+    '@vue/typescript'
   ],
   rules: {
     'no-console': 'off',
@@ -15,6 +16,6 @@ module.exports = {
     'semi': [2, 'always']
   },
   parserOptions: {
-    parser: 'babel-eslint'
+    parser: '@typescript-eslint/parser'
   }
 };
