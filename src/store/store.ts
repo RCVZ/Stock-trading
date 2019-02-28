@@ -1,33 +1,47 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import stocks from '../data/stocks.js';
+import stocks from '@/data/stocks.ts';
 
 Vue.use(Vuex);
 
-interface stock {
-  price: number
+interface State {
+  stocks: Array<object> | Array<undefined>,
+  funds: number,
+  portfolioStocks?: Array<object> | Array<undefined>
 }
 
-export default new Vuex.Store({
+interface Stock {
+  id: string,
+  name: string,
+  price: number,
+  quantity?: number
+}
+
+interface Portfolio {
+  id: string,
+  quantity: number
+}
+
+export default new Vuex.Store<State>({
   state: {
     stocks: [],
     funds: 10000,
     portfolioStocks: []
   },
   mutations: {
-    'SET_STOCKS' (state, stocks) {
+    SET_STOCKS (state, stocks: Array<object>): void {
       state.stocks = stocks;
     },
-    'RND_STOCK' (state) {
-      state.stocks.forEach((stock: stock) => {
+    RND_STOCK (state: any) {
+      state.stocks.forEach((stock: Stock): void => {
         if (stock.price < 3) {
           stock.price += 10;
         };
         stock.price = Math.round(stock.price * (1 + Math.random() - 0.45));
       });
     },
-    'BUY_STOCK' (state: any, { id, quantity, price }) {
-      const record = state.portfolioStocks.find((el: any) => el.id === id);
+    BUY_STOCK (state: any, { id, quantity, price }) {
+      const record = state.portfolioStocks.find((el: Portfolio) => el.id === id);
       if (record) {
         record.quantity += quantity;
       } else {
@@ -38,8 +52,8 @@ export default new Vuex.Store({
       }
       state.funds -= price * quantity;
     },
-    'SELL_STOCK' (state: any, { id, quantity , price }) {
-      const record = state.portfolioStocks.find((el: any) => el.id === id);
+    SELL_STOCK (state: any, { id, quantity, price }) {
+      const record = state.portfolioStocks.find((el: Portfolio) => el.id === id);
       if (record.quantity > quantity) {
         record.quantity -= quantity;
       } else {
@@ -48,7 +62,7 @@ export default new Vuex.Store({
       }
       state.funds += price * quantity;
     },
-    'SET_PORTFOLIO' (state, portfolio) {
+    SET_PORTFOLIO (state, portfolio) {
       state.funds = portfolio.funds;
       state.portfolioStocks = portfolio.portfolioStocks ? portfolio.portfolioStocks : [];
     }
@@ -68,8 +82,8 @@ export default new Vuex.Store({
     },
     loadData: ({ commit }) => {
       Vue.http.get('data.json')
-        .then((response: any )=> response.json())
-        .then((data: any )=> {
+        .then((response: any) => response.json())
+        .then((data: any) => {
           if (data) {
             const stocks = data.stocks;
             const funds = data.funds;
@@ -90,12 +104,12 @@ export default new Vuex.Store({
     stocks: state => {
       return state.stocks;
     },
-    portfolioStocks: state => state.portfolioStocks.map((stock: any) => {
+    portfolioStocks: (state: any) => state.portfolioStocks.map((stock: any) => {
       const record = state.stocks.find((el: any) => el.id === stock.id);
-      const { id, quantity, } = stock;
+      const { id, quantity } = stock;
       const { name, price }: any = record;
       return {
-        id:id,
+        id: id,
         quantity: quantity,
         name: name,
         price: price

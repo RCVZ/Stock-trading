@@ -76,42 +76,35 @@
   </nav>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator';
 import { mapActions } from 'vuex';
 
-export default {
-  data () {
-    return {
-      expand: false
+@Component
+export default class Header extends Vue {
+  expand: boolean = false;
+
+  get funds () {
+    return this.$store.getters.funds;
+  }
+
+  rdnStock () {
+    this.$store.dispatch('randomizeStocks');
+  }
+
+  save () {
+    const { funds, portfolioStocks, stocks } = this.$store.getters;
+    const data = {
+      funds,
+      portfolioStocks,
+      stocks
     };
-  },
-  computed: {
-    funds () {
-      return this.$store.getters.funds;
-    }
-  },
-  methods: {
-    ...mapActions([
-      'randomizeStocks',
-      'loadData'
-    ]),
-    rdnStock () {
-      this.randomizeStocks();
-    },
-    save () {
-      const { funds, portfolioStocks, stocks } = this.$store.getters;
-      const data = {
-        funds,
-        portfolioStocks,
-        stocks
-      };
-      this.$http.put('data.json', data);
-      this.expand = false;
-    },
-    load () {
-      this.loadData();
-      this.expand = false;
-    }
+    this.$http.put('data.json', data);
+    this.expand = false;
+  }
+  load () {
+    this.$store.dispatch('loadData');
+    this.expand = false;
   }
 };
 </script>

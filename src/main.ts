@@ -7,7 +7,7 @@ import VueResource from 'vue-resource';
 Vue.config.productionTip = false;
 
 Vue.use(VueResource);
-//Vue.http.options.root = 'https://stock-trading-vue.firebaseio.com/';
+//  Vue.http.options.root = 'https://stock-trading-vue.firebaseio.com/';
 
 new Vue({
   router,
